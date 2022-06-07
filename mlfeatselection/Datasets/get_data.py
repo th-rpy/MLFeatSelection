@@ -64,19 +64,41 @@ class Data:
         return self.data, self.target, self.name # return the data and target
     
     def describe_data(self): 
-        description_list = []
-        name = self.name
-        lines, columns = self.data.shape
-        attributes = self.data.columns
-        n_classes = len(np.unique(self.target))
-        distribution_classes = self.target.value_counts()
+        
+        description_list = [] # list to store the description of the data
+        name = self.name # get the name of the dataset
+        lines, columns = self.data.shape # get the shape of the data
+        attributes = self.data.columns # get the attributes of the data
+        n_classes = len(np.unique(self.target)) # get the number of classes
+        distribution_classes = self.target.value_counts() # get the distribution of the classes
         description_list.append([name,
                            lines,
                           len(attributes),
                            n_classes,
-                           tuple(distribution_classes)])
-        print(tabulate(description_list, headers=["Dataset", "Lines", "Attributes", "Classes", "Distribution"]))
-        return description_list
+                           tuple(distribution_classes)]) # append the description to the list
+        print("\n=========== Dataset Summary ===========\n")
+        print(tabulate(description_list, headers=["Dataset", "Lines", "Attributes", "Classes", "Distribution"])) # print the table
+        print("==========================================\n")
+        return description_list # return the description list
+    
+    def data_preprocessing(self, continuous_columns = None, categorical_columns = None, vars_to_drop = None):
+        
+        if vars_to_drop is not None: # if the user wants to drop some variables
+            assert isinstance(vars_to_drop, list), "vars_to_drop must be a list" # check if the vars_to_drop is a list
+            for var in vars_to_drop:
+                assert var in self.data.columns, "Variable to drop not found in dataset"
+                self.data.drop(var, axis=1, inplace=True)
+        
+        self.data = self.data.dropna() # drop the NaN values
+        self.data = self.data.drop_duplicates() # drop the duplicated values
+        
+        # Starting preprocessing
+        if continuous_columns is None and categorical_columns is None: # if the user doesn't specify the columns
+            num_data = [cname for cname in self.data.columns if self.data[cname].dtypes in ['int64', 'float64']] # get the numeric columns
+            cat_data = list(filter(lambda x: x not in num_data, self.data.columns)) # get the categorical data
+
+        print(num_data)
+        print(cat_data)
         
     def __str__(self):
         return str(self.display_datasets())
@@ -84,7 +106,7 @@ class Data:
 d = Data()
 #d.display_datasets()
 d.get_dataset_by_path('mlfeatselection/mlfeatselection/Datasets/iris.csv', target = 'Species', delimiter=',')
-d.describe_data()
+d.data_preprocessing(vars_to_drop= ['Id'])
 
 """data_paths = glob.glob(os.getcwd() + "/OUR_DATA/*.csv")
 list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]

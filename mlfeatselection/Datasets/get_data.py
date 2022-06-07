@@ -14,10 +14,10 @@ class Data:
         self.label = None
         
     def get_dataset(self, dataset_name):
+        
         # function to retrieve the data
         full_path = os.path.realpath(__file__)
         data_paths = glob.glob(os.path.dirname(full_path) + "/OUR_DATA/*.csv")
-        list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]
 
         stream = pkg_resources.resource_stream(__name__, 'OUR_DATA/' + dataset_name + '.csv')
         df = pd.read_csv(stream, header=1, sep=',')
@@ -25,10 +25,18 @@ class Data:
         self.target = np.array(df.iloc[:, -1])
         print("Requested dataset found and loaded...")
 
-        return list_datasets, self.data, self.target 
+        return self.data, self.target 
+    
+    def get_dataset_names(self):
+        # function to retrieve the data
+        full_path = os.path.realpath(__file__)
+        data_paths = glob.glob(os.path.dirname(full_path) + "/OUR_DATA/*.csv")
+        list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]
+
+        return list_datasets
     
     def __str__(self):
-        return str(self.get_dataset('iris')[0])
+        return str(self.get_dataset_names())
     
     
 d = Data()

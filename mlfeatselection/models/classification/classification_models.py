@@ -58,13 +58,25 @@ class ClassificationModels:
         self.model = func()  # define the model
         return ClassificationModels(self.model)  # return the model
 
+    def split_data(self, X, y, test_size=0.2):
+        """Split the data in train and test sets"""
+        assert isinstance(X, np.ndarray), "X must be a numpy array"
+        assert isinstance(y, np.ndarray), "y must be a numpy array"
+        assert X.shape[0] == y.shape[0], "X and y must have the same number of rows"
+        assert test_size >= 0 and test_size <= 1, "test_size must be between 0 and 1"
+
+        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
+            X, y, test_size=test_size
+        )
+        return X_train, X_test, y_train, y_test
+
     def fit_model(self, X, y):
         """Fit the model"""
         assert isinstance(X, np.ndarray), "X must be a numpy array"
         assert isinstance(y, np.ndarray), "y must be a numpy array"
 
         try:
-            self.model.fit(X, y)
+            self.model.fit(X, y.reshape(-1, 1))
         except Exception as e:
             print(e)
             print("Model not trained")
@@ -130,23 +142,37 @@ class ClassificationModels:
             print("Model confusion matrix not calculated")
             cm = np.zeros((2, 2))
 
+    def get_model_classification_report(self, y_test, y_pred):
+        """Get the model classification report"""
+        assert isinstance(y_test, np.ndarray), "y_test must be a numpy array"
+        assert isinstance(y_pred, np.ndarray), "y_pred must be a numpy array"
+        assert (
+            y_test.shape == y_pred.shape
+        ), "y_test and y_pred must have the same shape"
+        try:
+            report = sklearn.metrics.classification_report(y_test, y_pred)
+        except Exception as e:
+            print(e)
+            print("Model classification report not calculated")
+            report = "Model classification report not calculated"
+        print(report)
+        return report
+
 
 clsModel = ClassificationModels()
 LogisticCls = clsModel.define_model_by_name("LogisticRegression")
-clsModel.fit_model(
-    np.array([[1, 2, 3], [4, 8, 9], [10, -1, 63]]), np.array([0, 1, 0]).reshape(-1, 1)
-)
-y_pred = clsModel.predict_model(np.array([[1, 2, 2.13]]))
-print(y_pred)
-disp = ConfusionMatrixDisplay.from_estimator(
-    clsModel.model,
-    np.array([[1, 2, 2.13], [4, 8, 9], [10, -1, 63]]),
-    np.array([0, 1, 0]).reshape(-1, 1),
-)
-disp.ax_.set_title("title")
-print(disp.confusion_matrix)
+X = np.array([[1, 2, 3], [4, 8, 9], [10, -1, 63]])
+X_test = np.array([[1, 2, 2.13], [1, 1, 2]])
+y = np.array([0, 1, 0])
+y_test = np.array([0, 1])
 
-plt.show()
+clsModel.fit_model(X, y.reshape(-1, 1))
+y_pred = clsModel.predict_model(X_test)
+print(y_pred)
+accuracy = clsModel.get_model_accuracy(y_test, y_pred)
+clsModel.display_model_confusion_matrix(X_test, y_test)
+clsModel.get_model_classification_report(y_test, y_pred)
+
 """import importlib
 
 

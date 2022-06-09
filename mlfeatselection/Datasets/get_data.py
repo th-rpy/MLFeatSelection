@@ -169,12 +169,12 @@ class Data:
         return str(self.display_datasets())
 
 
-d = Data()
+'''d = Data()
 # d.display_datasets()
 d.get_dataset_by_path(
     "mlfeatselection/mlfeatselection/Datasets/iris.csv", target="Species", delimiter=","
 )
-d.data_preprocessing(vars_to_drop=["Id"])
+d.data_preprocessing(vars_to_drop=["Id"])'''
 
 """data_paths = glob.glob(os.getcwd() + "/OUR_DATA/*.csv")
 list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]

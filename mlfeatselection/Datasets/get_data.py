@@ -163,18 +163,19 @@ class Data:
                     self.data[col], prefix=str(col)
                 )  # label binarize the column
 
-        return self.data  # return the data
+        return self.data, self.target  # return the data
 
     def __str__(self):
         return str(self.display_datasets())
 
 
-'''d = Data()
+d = Data()
 # d.display_datasets()
 d.get_dataset_by_path(
     "mlfeatselection/mlfeatselection/Datasets/iris.csv", target="Species", delimiter=","
 )
-d.data_preprocessing(vars_to_drop=["Id"])'''
+d.data_preprocessing(vars_to_drop=["Id"])
+print(d.data.head())
 
 """data_paths = glob.glob(os.getcwd() + "/OUR_DATA/*.csv")
 list_datasets = [os.path.splitext(os.path.basename(filename))[0] for filename in data_paths]

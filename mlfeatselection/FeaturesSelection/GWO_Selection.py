@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import benchmarks
 import repackage
+
 repackage.up()
 from Datasets.get_data import *
 
@@ -12,14 +13,17 @@ from Datasets.get_data import *
 class GwoAlgo:
     """GWO Optimization algo for feature selection."""
 
-    def __init__(self, objf, lb, ub, dim = None, SearchAgents_no, Max_iter) -> None:
+    def __init__(self, data, target, objf, lb, ub, SearchAgents_no, Max_iter) -> None:
 
+        self.data = data # dataframe of the dataset to be used for feature selection (data)
+        self.target = target # target variable of the dataset to be used for feature selection (target)
         self.objf = objf  # objective function to be optimized
         self.lb = lb  # lower bound of the search space
         self.ub = ub  # upper bound of the search space
-        self.dim = dim  # dimension of the search space
+        self.dim = self.data.shape[1]  # dimension of the search space
         self.SearchAgents_no = SearchAgents_no  # number of search agents
         self.Max_iter = Max_iter  # maximum number of iterations
+        
 
     def initiations(self):
 
@@ -173,28 +177,30 @@ class GwoAlgo:
         print("Delta position=", Delta_pos)
         return Alpha_pos, Beta_pos
 
-    def select_features(self, data, target, n_features, threshold=-0.1):
+    def select_features(self, threshold=-0.1):
         """Select features for the model."""
         # Select features
         ##Applying feature selection on the given dataset
         ##considering alpha as best solution and putting a threshold
-        self.dim = n_features
         alpha, _ = self.optimize()
         print("Number of selected features = ", alpha.shape[0])
         selected_data = pd.DataFrame()
         assert (
-            data.shape[1] == n_features
+            data.shape[1] == self.dim
         ), "ERROR ..."  # check if the number of features is correct
 
         for i in range(0, alpha.shape[0]):
             if alpha[i] >= threshold:
-                selected_data[data.columns[i]] = data[data.columns[i]].astype(float)
+                selected_data[self.data.columns[i]] = self.data[self.data.columns[i]]
         print("The modified data is following")
         # selected_data.head()  # only 491 are selected
-        returned_data = Data(selected_data, target)
-        return returned_data
+        returned_data = Data()
+        returned_data.data = selected_data # assign the selected data to the returned_data
+        returned_data.target = self.target # assign the target to the returned_data
+        return returned_data # return the selected data
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     ##setting GWO parameters
     Max_iter = 80
     SearchAgents_no = 35
@@ -202,11 +208,23 @@ if __name__ == '__main__':
     search_domain = [0, 1]
     lb = -1.0
     ub = 1.0
+    d = Data()
+    # d.display_datasets()
+    d.get_dataset_by_path(
+        "mlfeatselection/mlfeatselection/Datasets/iris.csv", target="Species", delimiter=","
+    )
+    
+    data, target = d.data_preprocessing(vars_to_drop= ['Id'])
 
     func_details = benchmarks.getFunctionDetails(6)
     f = getattr(benchmarks, "F5")
-    g = GwoAlgo(f, lb, ub, dimension, SearchAgents_no, Max_iter)
+    g = GwoAlgo(data, target, f, lb, ub, SearchAgents_no, Max_iter)
     for i in range(0, 1):
         alpha, beta = g.optimize()
-        
     
+    D = g.select_features(threshold=0.)
+    
+    print("The modified data is following \n") 
+    print(D.data.head())
+
+

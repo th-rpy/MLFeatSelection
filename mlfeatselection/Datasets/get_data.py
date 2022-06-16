@@ -15,8 +15,10 @@ class Data:
 
     """Class to get the data from the dataset, store it in a class and preprocessing it."""
 
-    full_path = os.path.realpath(__file__) # get the full path of the file
-    data_paths = glob.glob(os.path.dirname(full_path) + "/OUR_DATA/*.csv") # get the data paths
+    full_path = os.path.realpath(__file__)  # get the full path of the file
+    data_paths = glob.glob(
+        os.path.dirname(full_path) + "/OUR_DATA/*.csv"
+    )  # get the data paths
 
     def __init__(self) -> None:
         self.data = None  # data
@@ -29,26 +31,26 @@ class Data:
         self.name = dataset_name
         stream = pkg_resources.resource_stream(
             __name__, "OUR_DATA/" + dataset_name + ".csv"
-        ) # get the stream of the dataset
-        df = pd.read_csv(stream, header=None, sep=",") # read the dataset
-        self.data = df.iloc[:, 0:-1] # get the data
-        self.target = df.iloc[:, -1] # get the target
+        )  # get the stream of the dataset
+        df = pd.read_csv(stream, header=None, sep=",")  # read the dataset
+        self.data = df.iloc[:, 0:-1]  # get the data
+        self.target = df.iloc[:, -1]  # get the target
         print("Requested dataset found and loaded... \n")
         print("Dataset: " + dataset_name + "\n")
         print("Shape of data: " + str(self.data.shape) + "\n")
         print("Shape of target: " + str(self.target.shape) + "\n")
         print("==========================================\n")
         print(df.head(5))
-        return self.data, self.target, self.name # return the data, target and name
+        return self.data, self.target, self.name  # return the data, target and name
 
     def get_dataset_names(self):
 
         list_datasets = [
             os.path.splitext(os.path.basename(filename))[0]
             for filename in Data.data_paths
-        ] # get the list of the datasets names from the data paths
+        ]  # get the list of the datasets names from the data paths
 
-        return list_datasets # return the list of the datasets names
+        return list_datasets  # return the list of the datasets names
 
     def display_datasets(self):
         # inner function to display the available dataset
@@ -60,9 +62,11 @@ class Data:
         table_list = []
 
         for i, dataset in enumerate(list_datasets):
-            table_list.append([i + 1, list_datasets[i]]) # append the dataset to the list
+            table_list.append(
+                [i + 1, list_datasets[i]]
+            )  # append the dataset to the list
 
-        print(tabulate(table_list, headers=["Index", "Dataset"])) # print the table
+        print(tabulate(table_list, headers=["Index", "Dataset"]))  # print the table
 
     def get_dataset_by_path(self, dataset_path, target, delimiter=","):
 

@@ -158,8 +158,24 @@ class ClassificationModels:
         print(report)
         return report
 
+    def get_results_details(self, X_test, y_test):
+        y_pred = self.predict_model(X_test)
+        d = {
+            "index": 1,
+            "Model": self.name,
+            "Accuracy": sklearn.metrics.accuracy_score(y_test, y_pred),
+            "Precision": sklearn.metrics.precision_score(y_test, y_pred),
+            "Recall": sklearn.metrics.recall_score(y_test, y_pred),
+            "F1 Score": sklearn.metrics.f1_score(y_test, y_pred),
+        }
+        return d
+
+    def __str__(self):
+        return "\n".join(self.get_list_models())
+
 
 clsModel = ClassificationModels()
+print(clsModel)
 LogisticCls = clsModel.define_model_by_name("LogisticRegression")
 X = np.array([[1, 2, 3], [4, 8, 9], [10, -1, 63]])
 X_test = np.array([[1, 2, 2.13], [1, 1, 2]])
@@ -172,14 +188,3 @@ print(y_pred)
 accuracy = clsModel.get_model_accuracy(y_test, y_pred)
 clsModel.display_model_confusion_matrix(X_test, y_test)
 clsModel.get_model_classification_report(y_test, y_pred)
-
-"""import importlib
-
-
-function_string = str(classifiers[0][1]).split(" ")[1][1:-2]
-mod_name, func_name = function_string.rsplit(".", 1)
-mod = importlib.import_module(mod_name)
-func = getattr(mod, func_name)
-result = func()
-print(type(result))
-print(str(classifiers[0][1]).split(' ')[1][1:-2] == function_string)"""

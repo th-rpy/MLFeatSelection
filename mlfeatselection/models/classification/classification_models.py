@@ -56,6 +56,7 @@ class ClassificationModels:
         mod = importlib.import_module(mod_name)  # import the module
         func = getattr(mod, func_name)  # get the function
         self.model = func()  # define the model
+        self.name = model_name  # define the name of the model
         return ClassificationModels(self.model)  # return the model
 
     def split_data(self, X, y, test_size=0.2):
@@ -174,17 +175,24 @@ class ClassificationModels:
         return "\n".join(self.get_list_models())
 
 
-clsModel = ClassificationModels()
-print(clsModel)
-LogisticCls = clsModel.define_model_by_name("LogisticRegression")
-X = np.array([[1, 2, 3], [4, 8, 9], [10, -1, 63]])
-X_test = np.array([[1, 2, 2.13], [1, 1, 2]])
-y = np.array([0, 1, 0])
-y_test = np.array([0, 1])
+clsModel = ClassificationModels()  # create the model object
+LogisticCls = clsModel.define_model_by_name(
+    "LogisticRegression"
+)  # define the model by name "LogisticRegression"
+X = np.array([[1, 2], [2, 4], [4, 5], [3, 2], [3, 1]])  # define the X data
+X_test = np.array([[1, 2], [1, 1], [4, 5]])  # define the X test data
+y = np.array([0, 0, 1, 1, 0])  # define the y data
+y_test = np.array([0, 1, 1])  # define the y test data
 
+# fit the model
 clsModel.fit_model(X, y.reshape(-1, 1))
-y_pred = clsModel.predict_model(X_test)
-print(y_pred)
-accuracy = clsModel.get_model_accuracy(y_test, y_pred)
-clsModel.display_model_confusion_matrix(X_test, y_test)
-clsModel.get_model_classification_report(y_test, y_pred)
+y_pred = clsModel.predict_model(X_test)  # predict the model
+print(y_pred)  # print the predicted data
+accuracy = clsModel.get_model_accuracy(y_test, y_pred)  # get the model accuracy
+clsModel.display_model_confusion_matrix(
+    X_test, y_test
+)  # display the model confusion matrix
+clsModel.get_model_classification_report(
+    y_test, y_pred
+)  # get the model classification report
+print(clsModel.get_results_details(X_test, y_test))  # get the results details

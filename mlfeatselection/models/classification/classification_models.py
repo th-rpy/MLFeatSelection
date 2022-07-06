@@ -162,7 +162,7 @@ class ClassificationModels:
     def get_results_details(self, X_test, y_test):
         y_pred = self.predict_model(X_test)
         d = {
-            "index": 1,
+            "index": 0,
             "Model": self.name,
             "Accuracy": sklearn.metrics.accuracy_score(y_test, y_pred),
             "Precision": sklearn.metrics.precision_score(y_test, y_pred),
